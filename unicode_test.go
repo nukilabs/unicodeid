@@ -8,7 +8,6 @@ import (
 	"unicode/utf8"
 
 	"github.com/nukilabs/unicodeid"
-	"golang.org/x/text/unicode/rangetable"
 )
 
 func genString(pNonASCII int) string {
@@ -26,18 +25,12 @@ func genString(pNonASCII int) string {
 	return string(result)
 }
 
-var (
-	unicodeRangeIdNeg      = rangetable.Merge(unicode.Pattern_Syntax, unicode.Pattern_White_Space)
-	unicodeRangeIdStartPos = rangetable.Merge(unicode.Letter, unicode.Nl, unicode.Other_ID_Start)
-	unicodeRangeIdContPos  = rangetable.Merge(unicodeRangeIdStartPos, unicode.Mn, unicode.Mc, unicode.Nd, unicode.Pc, unicode.Other_ID_Continue)
-)
-
 func isIdStartUnicode(r rune) bool {
-	return unicode.Is(unicodeRangeIdStartPos, r) && !unicode.Is(unicodeRangeIdNeg, r)
+	return unicode.In(r, unicode.Letter, unicode.Nl, unicode.Other_ID_Start) && !unicode.In(r, unicode.Pattern_Syntax, unicode.Pattern_White_Space)
 }
 
 func isIdPartUnicode(r rune) bool {
-	return unicode.Is(unicodeRangeIdContPos, r) && !unicode.Is(unicodeRangeIdNeg, r) || r == '\u200C' || r == '\u200D'
+	return unicode.In(r, unicode.Letter, unicode.Nl, unicode.Other_ID_Start, unicode.Mn, unicode.Mc, unicode.Nd, unicode.Pc, unicode.Other_ID_Continue) && !unicode.In(r, unicode.Pattern_Syntax, unicode.Pattern_White_Space)
 }
 
 func isIdentifierStart(chr rune) bool {
